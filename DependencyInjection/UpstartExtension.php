@@ -22,7 +22,7 @@ class UpstartExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-//        print_r($config);
+        print_r($config);
 //        exit();
 //
     }
