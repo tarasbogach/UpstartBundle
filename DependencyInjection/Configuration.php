@@ -41,17 +41,82 @@ class Configuration implements ConfigurationInterface
     protected function appendJobTo(NodeBuilder $node){
         return $node
             #Process Definition
-            ->scalarNode('exec')->end()
-            ->scalarNode('preStart')->end()
-            ->scalarNode('postStart')->end()
-            ->scalarNode('preStop')->end()
-            ->scalarNode('postStop')->end()
-            ->scalarNode('script')->end()
+            ->scalarNode('exec')
+                ->info('
+Syntax: exec COMMAND [ ARG ]...
+Example:
+/usr/bin/my-daemon --option foo -v
+'
+                )
+                ->validate()->ifNull()->thenUnset()->end()
+            ->end()
+            ->scalarNode('preStart')
+                ->info('
+Syntax: pre-start exec|script ... end script
+Example:
+script
+  [ -d "/var/cache/squid" ] || squid -k
+end script
+'
+                )
+                ->validate()->ifNull()->thenUnset()->end()
+            ->end()
+            ->scalarNode('postStart')
+                ->info('
+Syntax: post-start exec|script ... end script
+Example:
+script
+  while ! mysqladmin ping localhost ; do sleep 1 ; done
+end script
+')
+                ->validate()->ifNull()->thenUnset()->end()
+            ->end()
+            ->scalarNode('preStop')
+                ->info('
+Syntax: pre-stop exec|script ... end script
+Example:
+exec /some/directory/script
+'
+                )
+                ->validate()->ifNull()->thenUnset()->end()
+            ->end()
+            ->scalarNode('postStop')
+                ->info('
+Syntax: post-stop exec|script ... end script
+Example:
+exec /some/directory/script
+'
+                )
+                ->validate()->ifNull()->thenUnset()->end()
+            ->end()
+            ->scalarNode('script')
+                ->info('
+Syntax: script ... end script
+Example:
+script
+  /some/directory/script >> /var/log/some-log.log
+end script
+'
+                )
+                ->validate()->ifNull()->thenUnset()->end()
+            ->end()
 
             #Event Definition
-            ->booleanNode('manual')->defaultFalse()->end()
-            ->scalarNode('startOn')->end()
-            ->scalarNode('stopOn')->end()
+            ->scalarNode('manual')
+                ->info('This stanza will tell Upstart to ignore the start on / stop on stanzas.')
+                ->example('true')
+                ->validate()->ifNull()->thenUnset()->end()
+            ->end()
+            ->scalarNode('startOn')
+                ->info('start on EVENT [[KEY=]VALUE]... [and|or...]')
+                ->example('event1 and runlevel [2345] and (local-filesystems and net-device-up IFACE!=lo)')
+                ->validate()->ifNull()->thenUnset()->end()
+            ->end()
+            ->scalarNode('stopOn')
+                ->info('stop on EVENT [[KEY=]VALUE]... [and|or...]')
+                ->example('runlevel [016] or event2')
+                ->validate()->ifNull()->thenUnset()->end()
+            ->end()
 
             #Job Environment
             ->arrayNode('env')
@@ -220,7 +285,7 @@ class Configuration implements ConfigurationInterface
                     'SIGTTIN','SIGTTOU','SIGURG','SIGXCPU','SIGXFSZ',
                     'SIGVTALRM','SIGPROF','SIGWINCH','SIGIO','SIGPWR',
                 ])
-                ->defaultValue('SIGTERM')
+                ->defaultValue('SIGHUP')
             ->end()
 
             #Symfony
