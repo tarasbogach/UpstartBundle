@@ -5,7 +5,8 @@ upstart:
 	project: imaging
 	default:
 		verbose: 1
-		native: {setuid: www-data}
+		native:
+			setuid: "www-data"
 	job:
 		imageResizer:
 			quantity: 10
