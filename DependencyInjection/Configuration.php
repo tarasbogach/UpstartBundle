@@ -54,7 +54,6 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->scalarNode('configDir')
                 ->info('Root directory of upstart config files.')
-                ->isRequired()
                 ->defaultValue('/etc/init')
             ->end()
             ->scalarNode('logDir')
