@@ -1,0 +1,11 @@
+{
+  "name": "sfnix/upstart",
+  "description": "Upstart integration for Symfony projects.",
+  "keywords": ["upstart", "utils", "linux"],
+  "homepage": "https://github.com/tarasbogach/SfNixUpstartBundle",
+  "license": "MIT",
+  "authors": [
+    {"name": "Taras Bogach", "email": "taras.bogach@gmail.com"}
+  ],
+  "require": {}
+}
