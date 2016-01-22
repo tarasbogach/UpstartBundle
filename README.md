@@ -8,5 +8,5 @@ upstart:
         native: {setuid: www-data}
     job:
         imageResizer: {quantity: 10, command: "rabbitmq:consumer imageResizer -w"}
-        faceRecognizer: {quantity: 5, native: {exec: "python faceRecognizer.py", killSignal: "SIGKILL"}
+        faceRecognizer: {quantity: 5, native: {exec: "python faceRecognizer.py", killSignal: "SIGKILL"}}
 ```
