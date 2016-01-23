@@ -12,19 +12,24 @@ use Symfony\Component\DependencyInjection\Loader;
  *
  * @link http://symfony.com/doc/current/cookbook/bundles/extension.html
  */
-class UpstartExtension extends Extension
-{
-    /**
-     * {@inheritdoc}
-     */
-    public function load(array $configs, ContainerBuilder $container)
-    {
-        $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
-        $container->setParameter('upstart', $config);
+class UpstartExtension extends Extension{
 
-        print_r($config);
-//        exit();
-//
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function load(array $configs, ContainerBuilder $container){
+		$configuration = new Configuration();
+		$config = $this->processConfiguration($configuration, $configs);
+		foreach($config['job'] as $name => &$option){
+			if(!isset($option['name'])){
+				$option['name'] = $name;
+			}
+		}
+		$container->setParameter('upstart', $config);
+//		print_r($config);
+//		exit();
+		$locator = new FileLocator(__DIR__ . '/../Resources/config/');
+		$loader = new Loader\YamlFileLoader($container, $locator);
+		$loader->load('config.yml');
+	}
 }

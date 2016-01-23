@@ -29,6 +29,7 @@ upstart:
         verbose: 1
         native:
             setuid: "www-data"
+            chdir: %kernel.logs_dir%
     job:
         websocket:
             script: "php bin/chat-server.php"
