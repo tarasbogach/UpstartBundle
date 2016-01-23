@@ -40,4 +40,6 @@ upstart:
             script: "python faceRecognizer.py"
             native: {killSignal: "SIGKILL"}
 ```
+TODO
 ##Full configuration reference
+TODO
