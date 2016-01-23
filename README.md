@@ -1,6 +1,28 @@
-# SfNixUpstartBundle
+#UpstartBundle
+##About
+[Symfony](http://symfony.com/what-is-symfony) bundle for painless [Upstart](http://upstart.ubuntu.com/cookbook/#introduction) configuration.
+It helps to make any symfony command (or any other script) run forever in background and restart on fails.
+Most common example of such script is [queue](https://www.rabbitmq.com) [consumer](https://github.com/videlalvaro/rabbitmqbundle), another example is [websocket](http://socketo.me) server.
+##Installation
+Require the bundle and its dependencies with composer:
+```bash
+$ composer require sfnix/upstart
+```
+Register the bundle:
+```php
+// app/AppKernel.php
+
+public function registerBundles()
+{
+    $bundles = array(
+        new SfNix\UpstartBundle\SfNixUpstartBundle(),
+    );
+}
+```
+##Usage
+Add the `upstart` section to your configuration file:
 ```yml
-#Example configuration
+# app/config/upstart.yml
 upstart:
     project: imaging
     default:
@@ -8,12 +30,14 @@ upstart:
         native:
             setuid: "www-data"
     job:
+        websocket:
+            script: "php bin/chat-server.php"
         imageResizer:
             quantity: 10
-            command: "rabbitmq:consumer imageResizer -w"
+            command: "rabbitmq:consumer image.resize -w"
         faceRecognizer:
             quantity: 5
-            native:
-                exec: "python faceRecognizer.py"
-                killSignal: "SIGKILL"
+            script: "python faceRecognizer.py"
+            native: {killSignal: "SIGKILL"}
 ```
+##Full configuration reference

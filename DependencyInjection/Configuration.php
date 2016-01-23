@@ -135,6 +135,14 @@ INFO
                         ->scalarNode('env')
                             ->info('Symfony command env option (env: prod -> --env prod)')
                         ->end()
+                        ->scalarNode('script')
+                            ->info(<<<INFO
+Run some shell script, not a symfony command.
+This is a shortcut for native:{exec:"..."}, or native:{script:"..."}.
+INFO
+                            )
+                            ->example('php bin/websocket-server.php')
+                        ->end()
         ;
         $jobNativeChildren = $jobPrototypeChildren->arrayNode('native')->children();
         $this->appendNativeToJob($jobNativeChildren);
