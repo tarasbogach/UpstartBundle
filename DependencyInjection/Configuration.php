@@ -46,7 +46,6 @@ class Configuration implements ConfigurationInterface
         ]);
         $rootChildren = $rootNode->children();
         $rootChildren
-
             ->scalarNode('project')
                 ->info('Project name will be used as a directory name for upstart config files, and as a prefix for event names.')
                 ->example('sfnix')
@@ -57,13 +56,8 @@ class Configuration implements ConfigurationInterface
                 ->defaultValue('/etc/init')
             ->end()
             ->scalarNode('logDir')
-                ->info(<<<INFO
-Redirect output of each job to log file in this dir.
-It can be app/logs dir of your project.
-If you will leave it empty, logs will be under default upstart log directory.
-INFO
-                )
-                ->validate()->ifNull()->thenUnset()->end()
+                ->info('Root directory of upstart log files.')
+                ->defaultValue('/var/log/upstart')
             ->end()
         ;
         $defaultChildren = $rootChildren
@@ -84,6 +78,14 @@ INFO
             ->scalarNode('env')
                 ->info('Symfony command env option (env: prod -> --env prod) It will be ignored if job has no "command".')
                 ->defaultValue('dev')
+            ->end()
+            ->scalarNode('logDir')
+                ->info(<<<INFO
+If you use any output redirection for the script,
+this option can help you tell the bundle where the log directory is.
+INFO
+                )
+                ->validate()->ifNull()->thenUnset()->end()
             ->end()
         ;
         $nativeChildren = $defaultChildren
@@ -142,6 +144,22 @@ This is a shortcut for native:{exec:"..."}, or native:{script:"..."}.
 INFO
                             )
                             ->example('php bin/websocket-server.php')
+                        ->end()
+                        ->scalarNode('logDir')
+                            ->info(<<<INFO
+If you use any output redirection for the script,
+this option can help you tell the bundle where the log directory is.
+INFO
+                            )
+                            ->validate()->ifNull()->thenUnset()->end()
+                        ->end()
+                        ->scalarNode('log')
+                            ->info(<<<INFO
+If you use any output redirection for the script,
+this option can help you tell the bundle what is log file base name.
+INFO
+                            )
+                            ->validate()->ifNull()->thenUnset()->end()
                         ->end()
         ;
         $jobNativeChildren = $jobPrototypeChildren->arrayNode('native')->children();
