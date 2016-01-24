@@ -21,6 +21,7 @@ class UpstartExtension extends Extension{
 		$configuration = new Configuration();
 		$config = $this->processConfiguration($configuration, $configs);
 		foreach($config['job'] as $name => &$option){
+//			TODO check project, names, tags, merge defaults.
 			if(!isset($option['name'])){
 				$option['name'] = $name;
 			}
