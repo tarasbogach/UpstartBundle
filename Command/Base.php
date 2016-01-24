@@ -55,7 +55,7 @@ abstract class Base extends ContainerAwareCommand{
 		$jobs = [];
 		$jobsNames = [];
 		foreach($config['job'] as $job){
-			if(in_array($job['name'], $filters) || array_intersect($job['tag'], $filters)){
+			if(in_array($job['name'], $filters) || (isset($job['tag']) && array_intersect($job['tag'], $filters))){
 				$jobs[] = $job;
 				$jobsNames[] = $job['name'];
 			}

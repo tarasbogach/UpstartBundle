@@ -24,11 +24,19 @@ class UpstartListCommand extends Base{
 		$filters = $input->getArgument('filter');
 		if(!$filters){
 			$config = $this->getContainer()->getParameter('upstart');
+			$dirArg = escapeshellarg($config['project'].'/');
 			if($input->getOption('watch')){
 				$interval = $input->getOption('interval');
-				$this->exec('watch -n %s %s', [$interval, "initctl list | grep {$config['project']}/"]);
+				$this->passthru('watch -n %s %s', [$interval, "initctl list | grep $dirArg"]);
 			}else{
-				$this->exec('initctl list | grep %s', [$config['project'].'/']);
+				$return = $this->exec("initctl list | grep $dirArg", []);
+				foreach(explode("\n", trim($return)) as $line){
+					if(strpos($line, ' stop/')){
+						$output->writeln("<fg=white;bg=red>$line</>");
+					}else{
+						$output->writeln("<fg=white;bg=green>$line</>");
+					}
+				}
 			}
 			return true;
 		}

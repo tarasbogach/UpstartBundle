@@ -26,8 +26,6 @@ class UpstartExtension extends Extension{
 			}
 		}
 		$container->setParameter('upstart', $config);
-//		print_r($config);
-//		exit();
 		$locator = new FileLocator(__DIR__ . '/../Resources/config/');
 		$loader = new Loader\YamlFileLoader($container, $locator);
 		$loader->load('config.yml');

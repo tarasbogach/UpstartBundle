@@ -13,7 +13,9 @@ class UpstartStartCommand extends Base{
 		parent::configure();
 		$this
 			->setName('upstart:start')
-			->setDescription('Start jobs. Use job names and tags as filter. Apply to all jobs if no filters are specified.');
+			->setDescription('Start jobs. Use job names and tags as filter. Apply to all jobs if no filters are specified.')
+			->addOption('no-wait', null, InputOption::VALUE_NONE, 'Do not wait for jobs to start.')
+		;
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output){
@@ -21,7 +23,7 @@ class UpstartStartCommand extends Base{
 		$filters = $input->getArgument('filter');
 		if(!$filters){
 			$config = $this->getContainer()->getParameter('upstart');
-			$this->exec('initctl emit %s', [$config['project'].'-start']);
+			$this->exec('initctl emit %s', [$config['project'].'.start']);
 			return true;
 		}
 		$jobs = $this->filter($filters);

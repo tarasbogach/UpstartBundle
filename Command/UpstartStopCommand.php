@@ -13,7 +13,9 @@ class UpstartStopCommand extends Base{
 		parent::configure();
 		$this
 			->setName('upstart:stop')
-			->setDescription('Stop jobs. Use job names and tags as filter. Apply to all jobs if no filters are specified.');
+			->setDescription('Stop jobs. Use job names and tags as filter. Apply to all jobs if no filters are specified.')
+			->addOption('no-wait', null, InputOption::VALUE_NONE, 'Do not wait for jobs to stop.')
+		;
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output){
@@ -21,7 +23,7 @@ class UpstartStopCommand extends Base{
 		$filters = $input->getArgument('filter');
 		if(!$filters){
 			$config = $this->getContainer()->getParameter('upstart');
-			$this->exec('initctl emit %s', [$config['project'].'-stop']);
+			$this->exec('initctl emit %s', [$config['project'].'.stop']);
 			return true;
 		}
 		$jobs = $this->filter($filters);
