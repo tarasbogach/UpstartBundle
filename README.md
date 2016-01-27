@@ -83,8 +83,8 @@ You can use multiple job names or tags as arguments for any command, to filter j
 ```bash
 # ./app/console upstart:stop websocket image
 ```
-You can use test command as job exec, for learning proposes.
-By default it runs forever, but take a look at `--exit` and `--error` options. 
+You can use test command as job exec, for learning purposes.
+It runs forever by default, but take a look at `--exit` and `--error` options. 
 ```bash
 # ./app/console upstart:test --error 10 -vvv
 ```
