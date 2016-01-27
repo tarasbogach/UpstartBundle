@@ -55,10 +55,6 @@ class Configuration implements ConfigurationInterface
 				->info('Root directory of upstart config files.')
 				->defaultValue('/etc/init')
 			->end()
-			->scalarNode('logDir')
-				->info('Root directory of upstart log files.')
-				->defaultValue('/var/log/upstart')
-			->end()
 		;
 		$defaultChildren = $rootChildren
 			->arrayNode('default')
@@ -68,12 +64,10 @@ class Configuration implements ConfigurationInterface
 		$defaultChildren
 			->booleanNode('debug')
 				->info('Symfony command debug option (debug: 0 -> --no-debug). It will be ignored if job has no "command".')
-				->defaultValue(true)
 			->end()
 			->integerNode('verbose')
 				->info('Symfony command verbose level option (verbose: 0 -> no options, verbose: 3 -> -vvv). It will be ignored if job has no "command".')
-				->min(0)->max(3)
-				->defaultValue(0)
+				->min(1)->max(3)
 			->end()
 			->scalarNode('env')
 				->info('Symfony command env option (env: prod -> --env prod) It will be ignored if job has no "command".')
@@ -85,7 +79,7 @@ If you use any output redirection for the script,
 this option can help you tell the bundle where the log directory is.
 INFO
 				)
-				->validate()->ifNull()->thenUnset()->end()
+				->defaultValue('/var/log/upstart')
 			->end()
 		;
 		$nativeChildren = $defaultChildren
@@ -149,7 +143,7 @@ INFO
 						->end()
 						->integerNode('verbose')
 							->info('Symfony command verbose level option (verbose: 0 -> no options, verbose: 3 -> -vvv)')
-							->min(0)->max(3)
+							->min(1)->max(3)
 						->end()
 						->scalarNode('env')
 							->info('Symfony command env option (env: prod -> --env prod)')

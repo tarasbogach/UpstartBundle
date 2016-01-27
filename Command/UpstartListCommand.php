@@ -22,26 +22,33 @@ class UpstartListCommand extends Base{
 	protected function execute(InputInterface $input, OutputInterface $output){
 		parent::execute($input, $output);
 		$filters = $input->getArgument('filter');
-		if(!$filters){
-			$config = $this->getContainer()->getParameter('upstart');
-			$dirArg = escapeshellarg($config['project'].'/');
-			if($input->getOption('watch')){
-				$interval = $input->getOption('interval');
-				$this->passthru('watch -n %s %s', [$interval, "initctl list | grep $dirArg"]);
-			}else{
-				$return = $this->exec("initctl list | grep $dirArg", []);
-				foreach(explode("\n", trim($return)) as $line){
-					if(strpos($line, ' stop/')){
-						$output->writeln("<fg=white;bg=red>$line</>");
-					}else{
-						$output->writeln("<fg=white;bg=green>$line</>");
-					}
+		$config = $this->getContainer()->getParameter('upstart');
+		if($filters){
+			$jobs = $this->filter($filters);
+		}else{
+			$jobs = $config['job'];
+		}
+		$grepArgs = [];
+		foreach($jobs as $job){
+			$grepArgs[] = '-e '.escapeshellarg("{$config['project']}/{$job['name']}");
+		}
+		$grepArgs = implode(' ', $grepArgs);
+		if($input->getOption('watch')){
+			$interval = $input->getOption('interval');
+			$this->passthru('watch -n %s %s', [$interval, "initctl list | grep $grepArgs"]);
+		}else{
+			$return = $this->exec("initctl list | grep $grepArgs", []);
+			foreach(explode("\n", $return) as $line){
+				if(!trim($line)){
+					continue;
+				}
+				if(strpos($line, ' stop/')){
+					$output->writeln("<fg=white;bg=red>$line</>");
+				}else{
+					$output->writeln("<fg=white;bg=green>$line</>");
 				}
 			}
-			return true;
 		}
-		$jobs = $this->filter($filters);
-		$output->writeln('Not implemented yet!');
 	}
 
 }

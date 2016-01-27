@@ -7,14 +7,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class UpstartStopCommand extends Base{
+class UpstartRestartCommand extends Base{
 
 	protected function configure(){
-		parent::configure();
 		$this
-			->setName('upstart:stop')
-			->setDescription('Stop jobs. Use job names and tags as filter. Apply to all jobs if no filters are specified.')
-			->addOption('no-wait', null, InputOption::VALUE_NONE, 'Do not wait for jobs to stop.')
+			->setName('upstart:restart')
+			->setDescription('Stop and start jobs. Use job names and tags as filter. Apply to all jobs if no filters are specified.')
 		;
 	}
 
@@ -26,15 +24,19 @@ class UpstartStopCommand extends Base{
 			foreach($filters as $filter){
 				if(in_array($filter, $config['tagNames'])){
 					$this->exec('initctl emit %s', ["{$config['project']}.{$filter}.stop"]);
+					$this->exec('initctl emit %s', ["{$config['project']}.{$filter}.start"]);
 				}elseif(in_array($filter, $config['jobNames'])){
 					$job = $config['job'][$filter];
 					$postfix = $job['quantity'] > 1 ? '-stopper':'';
+					$this->exec('initctl start %s', ["{$config['project']}/{$filter}{$postfix}"]);
+					$postfix = $job['quantity'] > 1 ? '-starter':'';
 					$this->exec('initctl start %s', ["{$config['project']}/{$filter}{$postfix}"]);
 				}
 			}
 		}else{
 			$config = $this->getContainer()->getParameter('upstart');
 			$this->exec('initctl emit %s', ["{$config['project']}.stop"]);
+			$this->exec('initctl emit %s', ["{$config['project']}.start"]);
 		}
 	}
 

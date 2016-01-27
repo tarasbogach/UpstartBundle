@@ -19,14 +19,15 @@ class UpstartInstallCommand extends Base{
 	protected function execute(InputInterface $input, OutputInterface $output){
 		parent::execute($input, $output);
 		$config = $this->getContainer()->getParameter('upstart');
-		print_r($config);
-//		$filters = $input->getArgument('filter');
-//		if(!$filters){
-//			$this->exec('initctl emit %s', [$config['project'].'-start']);
-//			return true;
-//		}
-//		$jobs = $this->filter($filters);
-//		$output->writeln('Not implemented yet!');
+		$filters = $input->getArgument('filter');
+		if($filters){
+			$jobs = $this->filter($filters);
+		}else{
+			$jobs = $config['job'];
+		}
+		foreach($jobs as $options){
+			print_r($options);
+		}
 	}
 
 }

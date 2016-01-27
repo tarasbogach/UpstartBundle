@@ -20,14 +20,22 @@ class UpstartStartCommand extends Base{
 
 	protected function execute(InputInterface $input, OutputInterface $output){
 		parent::execute($input, $output);
+		$config = $this->getContainer()->get('upstart');
 		$filters = $input->getArgument('filter');
-		if(!$filters){
+		if($filters){
+			foreach($filters as $filter){
+				if(in_array($filter, $config['tagNames'])){
+					$this->exec('initctl emit %s', ["{$config['project']}.{$filter}.start"]);
+				}elseif(in_array($filter, $config['jobNames'])){
+					$job = $config['job'][$filter];
+					$postfix = $job['quantity'] > 1 ? '-starter':'';
+					$this->exec('initctl start %s', ["{$config['project']}/{$filter}{$postfix}"]);
+				}
+			}
+		}else{
 			$config = $this->getContainer()->getParameter('upstart');
-			$this->exec('initctl emit %s', [$config['project'].'.start']);
-			return true;
+			$this->exec('initctl emit %s', ["{$config['project']}.start"]);
 		}
-		$jobs = $this->filter($filters);
-		$output->writeln('Not implemented yet!');
 	}
 
 }
