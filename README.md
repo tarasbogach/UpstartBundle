@@ -14,26 +14,25 @@ Register the bundle:
 
 public function registerBundles()
 {
-    $bundles = array(
+    $bundles = [
         new SfNix\UpstartBundle\SfNixUpstartBundle(),
-    );
+    ];
 }
 ```
 ##Usage
 Add the `upstart` section to your configuration file:
 ```yml
-# app/config/upstart.yml
+# Example app/config/upstart.yml
 upstart:
     project: imaging
     default:
         verbose: 1
         native:
             setuid: "www-data"
-            chdir: %kernel.logs_dir%
+            chdir: %kernel.root_dir%/..
     job:
         websocket:
             script: "php bin/chat-server.php"
-            tag: [server]
         imageResizer:
             quantity: 10
             command: "rabbitmq:consumer image.resize -w"
@@ -47,8 +46,8 @@ upstart:
             command: "upstart:test --error 10"
             verbose: 3
 ```
-Generate and install upstart files derived configuration.
-It also will try to enable bash completion for other commands of this bundle, including arguments derived configuration.
+Generate and install upstart files derived from your configuration.
+It also will try to enable bash completion for other commands of this bundle.
 ```bash
 # ./app/console upstart:install
 ```
