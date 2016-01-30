@@ -15,7 +15,7 @@ Register the bundle:
 public function registerBundles()
 {
     $bundles = [
-        new SfNix\UpstartBundle\SfNixUpstartBundle(),
+        new SfNix\UpstartBundle\UpstartBundle(),
     ];
 }
 ```
