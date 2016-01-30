@@ -26,6 +26,15 @@ class UpstartExtension extends Extension{
 	 * {@inheritdoc}
 	 */
 	public function load(array $configs, ContainerBuilder $container){
+		$hasConfig = false;
+		foreach($configs as $cnf){
+			if($cnf){
+				$hasConfig = true;
+			}
+		}
+		if(!$hasConfig){
+			return null;
+		}
 		$configuration = new Configuration();
 		$config = $this->processConfiguration($configuration, $configs);
 		$console = $container->getParameter('kernel.root_dir').'/console';
