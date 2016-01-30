@@ -9,6 +9,6 @@
     {"name": "Taras Bogach", "email": "taras.bogach@gmail.com"}
   ],
   "autoload": {
-    "psr-4": { "SfNix\\UpstartBundle\\UpstartBundle\\": "" }
+    "psr-4": { "SfNix\\UpstartBundle\\": "" }
   }
 }
