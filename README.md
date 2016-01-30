@@ -24,7 +24,7 @@ Add the `upstart` section to your configuration file:
 ```yml
 # Example app/config/upstart.yml
 upstart:
-    project: imaging
+    project: imagin
     default:
         verbose: 1
         native:
