@@ -29,21 +29,25 @@ class UpstartLogCommand extends Base{
 			$jobs = $config['job'];
 		}
 		$args = [];
+		$hasExpands = false;
 		foreach($jobs as $job){
-			$args[] = $job['log'];
+			if($job['quantity']>1){
+				$hasExpands = true;
+				$log = explode('.', $job['log']);
+				$ext = array_pop($log);
+				$log = implode('.', $log);
+				$args[] = escapeshellarg($log).'*.'.escapeshellarg($ext);
+			}else{
+				$args[] = escapeshellarg($job['log']);
+			}
 		}
-		$filesCount = count($args);
-		if($filesCount > 1){
-			$tailParam = '';
-		}else{
-			$tailParam = '-n %s';
-			$tail = $input->getOption('tail');
-			array_unshift($args, $tail);
+		if(count($args) == 1 && !$hasExpands){
+			array_unshift($args, '-n '.escapeshellarg($input->getOption('tail')));
 		}
 		if($input->getOption('watch')){
-			$this->passthru("tail -F $tailParam ".str_repeat(' %s', $filesCount), $args);
+			$this->passthru("tail -F ".implode(' ', $args), []);
 		}else{
-			$return = $this->exec("tail $tailParam ".str_repeat(' %s', $filesCount), $args);
+			$return = $this->exec("tail ".implode(' ', $args), []);
 			$output->writeln($return);
 		}
 	}

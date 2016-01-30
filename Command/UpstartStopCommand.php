@@ -27,9 +27,7 @@ class UpstartStopCommand extends Base{
 				if(in_array($filter, $config['tagNames'])){
 					$this->exec('initctl emit %s', ["{$config['project']}.{$filter}.stop"]);
 				}elseif(in_array($filter, $config['jobNames'])){
-					$job = $config['job'][$filter];
-					$postfix = $job['quantity'] > 1 ? '-stopper':'';
-					$this->exec('initctl start %s', ["{$config['project']}/{$filter}{$postfix}"]);
+					$this->exec('initctl stop %s', ["{$config['project']}/{$filter}"]);
 				}
 			}
 		}else{

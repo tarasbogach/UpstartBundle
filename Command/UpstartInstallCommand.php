@@ -14,7 +14,9 @@ class UpstartInstallCommand extends Base{
 		parent::configure();
 		$this
 			->setName('upstart:install')
-			->setDescription('Generate and install upstart files derived configuration. It also will try to enable bash completion for other commands of this bundle, including arguments derived configuration. Use job names and tags as filter. Apply to all jobs if no filters are specified.');
+			->setDescription(
+				'Generate and install upstart files derived configuration. It also will try to enable bash completion for other commands of this bundle, including arguments derived configuration. Use job names and tags as filter. Apply to all jobs if no filters are specified.'
+			);
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output){
@@ -33,81 +35,122 @@ class UpstartInstallCommand extends Base{
 				$output->writeln("<info>Dir '$dir' is created.</info>");
 			}else{
 				$output->writeln("<error>Can not mkdir '$dir'.</error>");
-				return;
+
+				throw new \Exception("Can not mkdir '$dir'.");
 			}
 		}
 		$stanzaNameMap = [
-			'preStart'=>'pre-start',
-			'postStart'=>'post-start',
-			'preStop'=>'pre-stop',
-			'postStop'=>'post-stop',
-			'startOn'=>'start on',
-			'stopOn'=>'stop on',
-			'normalExit'=>'normal exit',
-			'respawnLimit'=>'respawn limit',
-			'apparmorLoad'=>'apparmor load',
-			'apparmorSwitch'=>'apparmor switch',
-			'killSignal'=>'kill signal',
-			'killTimeout'=>'kill timeout',
-			'reloadSignal'=>'reload signal',
+			'preStart' => 'pre-start',
+			'postStart' => 'post-start',
+			'preStop' => 'pre-stop',
+			'postStop' => 'post-stop',
+			'startOn' => 'start on',
+			'stopOn' => 'stop on',
+			'normalExit' => 'normal exit',
+			'respawnLimit' => 'respawn limit',
+			'apparmorLoad' => 'apparmor load',
+			'apparmorSwitch' => 'apparmor switch',
+			'killSignal' => 'kill signal',
+			'killTimeout' => 'kill timeout',
+			'reloadSignal' => 'reload signal',
 		];
 		foreach($jobs as $options){
-			$content = [];
-			foreach($options['native'] as $stanza=>$value){
+			$controllerContent = [];
+			$instanceContent = [];
+			if($options['quantity'] > 1){
+				$instanceContent[] = 'instance $instance';
+			}
+			foreach($options['native'] as $stanza => $value){
 				if(isset($stanzaNameMap[$stanza])){
 					$stanza = $stanzaNameMap[$stanza];
 				}
 				switch($stanza){
+					case 'start on':
+					case 'stop on':
+						if($options['quantity']>1){
+							$controllerContent[] = "$stanza $value";
+							$instanceContent[] = "$stanza $value";
+						}else{
+							$instanceContent[] = "$stanza $value";
+						}
+						break;
 					case 'respawn':
 					case 'manual':
 					case 'task':
 						if($value){
-							$content[] = $stanza;
+							$instanceContent[] = $stanza;
 						}
 						break;
 					case 'script':
 						$value = strtr($value, ["\n" => "\n\t"]);
-						$content[] = "script\n\t$value\nend script";
+						$instanceContent[] = "script\n\t$value\nend script";
 						break;
 					case 'emits':
 					case 'export':
 						foreach($value as $item){
-							$content[] = "$stanza $item";
+							$instanceContent[] = "$stanza $item";
 						}
 						break;
 					case 'env':
-						foreach($value as $itemName=>$item){
+						foreach($value as $itemName => $item){
 							if($item){
-								$content[] = "$stanza $itemName=$item";
+								$instanceContent[] = "$stanza $itemName=$item";
 							}else{
-								$content[] = "$stanza $itemName";
+								$instanceContent[] = "$stanza $itemName";
 							}
 						}
 						break;
 					case 'respawn limit':
 					case 'normal exit':
-						$content[] = "$stanza ".implode(' ', $value);
+						$instanceContent[] = "$stanza " . implode(' ', $value);
 						break;
 					case 'cgroup':
 					case 'limit':
 						foreach($value as $item){
-							$content[] = "$stanza ".implode(' ', $item);
+							$instanceContent[] = "$stanza " . implode(' ', $item);
 						}
 						break;
 					default:
-						$content[] = "$stanza $value";
+						$instanceContent[] = "$stanza $value";
 						break;
 				}
 			}
-			$content = implode("\n", $content)."\n";
-			$file = "$dir/{$options['name']}.conf";
-			if(file_put_contents($file, $content)){
-				$output->writeln("<info>Created '$file'.</info>");
+			if($options['quantity'] > 1){
+				$instances = implode(' ', range(1, $options['quantity'], 1));
+				$controllerContent = implode("\n", $controllerContent);
+				$controllerContent = <<<BODY
+$controllerContent
+pre-start script
+    for instance in $instances
+    do
+        start {$config['project']}/{$options['name']}.instance instance=\$instance || :
+    done
+end script
+
+post-stop script
+    for instance in $instances
+    do
+        stop {$config['project']}/{$options['name']}.instance instance=\$instance || :
+    done
+end script
+
+BODY;
+				$controllerFile = "$dir/{$options['name']}.conf";
+				if(file_put_contents($controllerFile, $controllerContent)){
+					$output->writeln("<info>Created '$controllerFile'.</info>");
+				}else{
+					throw new \Exception("Can not write '$controllerFile'.");
+				}
+				$instanceFile = "$dir/{$options['name']}.instance.conf";
 			}else{
-				$output->writeln("<error>Can not write '$file'.</error>");
-				return;
+				$instanceFile = "$dir/{$options['name']}.conf";
 			}
-			#TODO add quantity support.
+			$instanceContent = implode("\n", $instanceContent) . "\n";
+			if(file_put_contents($instanceFile, $instanceContent)){
+				$output->writeln("<info>Created '$instanceFile'.</info>");
+			}else{
+				throw new \Exception("Can not write '$instanceFile'.");
+			}
 		}
 	}
 

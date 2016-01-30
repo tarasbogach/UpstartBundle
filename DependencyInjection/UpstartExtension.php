@@ -124,6 +124,13 @@ class UpstartExtension extends Extension{
 					unset($options[$key]);
 				}
 			}
+			if($options['quantity'] > 1){
+				if(isset($options['native']['instance'])){
+					throw new \InvalidArgumentException(
+						"quantity > 1 will conflict with native.instance stanza in job '{$options['name']}'."
+					);
+				}
+			}
 			$jobsByName[$options['name']]=$options;
 		}
 		$config['job'] = $jobsByName;

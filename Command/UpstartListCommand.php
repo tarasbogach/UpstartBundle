@@ -24,20 +24,20 @@ class UpstartListCommand extends Base{
 		$filters = $input->getArgument('filter');
 		$config = $this->getContainer()->getParameter('upstart');
 		if($filters){
+			$grepArgs = [];
 			$jobs = $this->filter($filters);
+			foreach($jobs as $job){
+				$grepArgs[] = '-e '.escapeshellarg("{$config['project']}/{$job['name']}");
+			}
+			$grepArgs = implode(' ', $grepArgs);
 		}else{
-			$jobs = $config['job'];
+			$grepArgs = '-e '.escapeshellarg("{$config['project']}/");
 		}
-		$grepArgs = [];
-		foreach($jobs as $job){
-			$grepArgs[] = '-e '.escapeshellarg("{$config['project']}/{$job['name']}");
-		}
-		$grepArgs = implode(' ', $grepArgs);
 		if($input->getOption('watch')){
 			$interval = $input->getOption('interval');
-			$this->passthru('watch -n %s %s', [$interval, "initctl list | grep $grepArgs"]);
+			$this->passthru('watch -n %s %s', [$interval, "initctl list | grep $grepArgs | sort"]);
 		}else{
-			$return = $this->exec("initctl list | grep $grepArgs", []);
+			$return = $this->exec("initctl list | grep $grepArgs | sort", []);
 			foreach(explode("\n", $return) as $line){
 				if(!trim($line)){
 					continue;
