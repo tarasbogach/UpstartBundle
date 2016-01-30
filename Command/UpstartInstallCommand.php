@@ -69,7 +69,6 @@ class UpstartInstallCommand extends Base{
 					case 'stop on':
 						if($options['quantity']>1){
 							$controllerContent[] = "$stanza $value";
-							$instanceContent[] = "$stanza $value";
 						}else{
 							$instanceContent[] = "$stanza $value";
 						}
