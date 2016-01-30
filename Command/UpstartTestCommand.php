@@ -21,19 +21,20 @@ class UpstartTestCommand extends Base{
 
 	protected function execute(InputInterface $input, OutputInterface $output){
 		parent::execute($input, $output);
+		$logger = $this->getContainer()->get('logger');
 		$startAt = time();
 		$exitAt = $input->getOption('exit') ? $startAt + $input->getOption('exit') : null;
 		$errorAt = $input->getOption('error') ? $startAt + $input->getOption('error') : null;
 		while(true){
 			sleep(1);
 			$now = time();
-			$this->logger->info('time', [$now - $startAt, 'seconds']);
+			$logger->info('time', [$now - $startAt, 'seconds']);
 			if($errorAt && $errorAt <= $now){
-				$this->logger->info('error', []);
+				$logger->info('error', []);
 				throw new \Exception("Test exception.");
 			}
 			if($exitAt && $exitAt <= $now){
-				$this->logger->info('exit', []);
+				$logger->info('exit', []);
 				exit(0);
 			}
 		}

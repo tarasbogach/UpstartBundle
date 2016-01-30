@@ -25,28 +25,21 @@ abstract class Base extends ContainerAwareCommand{
 	 */
 	protected $output;
 
-	/**
-	 * @var Logger
-	 */
-	protected $logger;
-
 	protected function execute(InputInterface $input, OutputInterface $output){
 		$this->input = $input;
 		$this->output = $output;
-		$this->logger = $this->getContainer()->get('logger');
 	}
 
 	protected function passthru($commandTmpl, $arguments = []){
 		$arguments = array_map('escapeshellarg', $arguments);
 		$command = vsprintf($commandTmpl, $arguments);
-		$this->logger->info(__FUNCTION__, [$command]);
 		passthru($command);
 	}
 
 	protected function exec($commandTmpl, $arguments = []){
 		$arguments = array_map('escapeshellarg', $arguments);
 		$command = vsprintf($commandTmpl, $arguments);
-		$this->logger->info(__FUNCTION__, [$command]);
+		$this->output->writeln("<info># $command</info>");
 		return shell_exec($command);
 	}
 
@@ -60,7 +53,8 @@ abstract class Base extends ContainerAwareCommand{
 				$jobsNames[] = $job['name'];
 			}
 		}
-		$this->logger->info(__FUNCTION__, ['job'=>$jobsNames]);
+		$jobsNames = implode(', ', $jobsNames);
+		$this->output->writeln("<info>Filtered jobs are: $jobsNames.</info>");
 		return $jobs;
 	}
 }

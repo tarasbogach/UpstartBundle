@@ -20,7 +20,7 @@ class UpstartStartCommand extends Base{
 
 	protected function execute(InputInterface $input, OutputInterface $output){
 		parent::execute($input, $output);
-		$config = $this->getContainer()->get('upstart');
+		$config = $this->getContainer()->getParameter('upstart');
 		$filters = $input->getArgument('filter');
 		if($filters){
 			foreach($filters as $filter){
