@@ -2,7 +2,6 @@
   "name": "sfnix/upstart",
   "description": "Upstart integration for Symfony projects.",
   "type": "symfony-bundle",
-  "autoload": "PSR-4",
   "keywords": [
     "upstart",
     "utils",
