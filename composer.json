@@ -2,18 +2,13 @@
   "name": "sfnix/upstart",
   "description": "Upstart integration for Symfony projects.",
   "type": "symfony-bundle",
-  "keywords": [
-    "upstart",
-    "utils",
-    "linux"
-  ],
+  "keywords": ["upstart", "utils", "linux"],
   "homepage": "https://github.com/tarasbogach/UpstartBundle",
   "license": "GPL",
   "authors": [
-    {
-      "name": "Taras Bogach",
-      "email": "taras.bogach@gmail.com"
-    }
+    {"name": "Taras Bogach", "email": "taras.bogach@gmail.com"}
   ],
-  "require": {}
+  "autoload": {
+    "psr-4": { "SfNix\\UpstartBundle\\UpstartBundle\\": "" }
+  }
 }
