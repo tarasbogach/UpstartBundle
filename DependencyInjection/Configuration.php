@@ -309,12 +309,12 @@ INFO
 	protected function appendNativeToJob(NodeBuilder $node){
 		$this->appendEventDefinitionTo($node);
 		$this->appendJobEnvironmentTo($node);
-		$this->appendProcessDefinitionTo($node);
 		$this->appendTasksTo($node);
-		$this->appendInstancesTo($node);
 		$this->appendProcessEnvironmentTo($node);
 		$this->appendProcessControlTo($node);
+		$this->appendProcessDefinitionTo($node);
 		$this->appendDocumentationTo($node);
+		$this->appendInstancesTo($node);
 		return $node;
 	}
 

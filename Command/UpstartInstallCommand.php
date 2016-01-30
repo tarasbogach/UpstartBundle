@@ -58,6 +58,13 @@ class UpstartInstallCommand extends Base{
 					$stanza = $stanzaNameMap[$stanza];
 				}
 				switch($stanza){
+					case 'respawn':
+					case 'manual':
+					case 'task':
+						if($value){
+							$content[] = $stanza;
+						}
+						break;
 					case 'script':
 						$value = strtr($value, ["\n" => "\n\t"]);
 						$content[] = "script\n\t$value\nend script";
