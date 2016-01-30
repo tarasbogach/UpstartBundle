@@ -138,8 +138,5 @@ class UpstartExtension extends Extension{
 		$config['tagNames'] = array_keys($tags);
 		unset($config['default']);
 		$container->setParameter('upstart', $config);
-		$locator = new FileLocator(__DIR__ . '/../Resources/config/');
-		$loader = new Loader\YamlFileLoader($container, $locator);
-		$loader->load('config.yml');
 	}
 }

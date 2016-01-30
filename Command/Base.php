@@ -45,6 +45,10 @@ abstract class Base extends ContainerAwareCommand{
 
 	protected function filter($filters){
 		$config = $this->getContainer()->getParameter('upstart');
+		$wrongFilters = array_diff($filters, $config['jobNames'], $config['tagNames']);
+		if($wrongFilters){
+			throw new \Exception('Unknown filters found: '.implode(', ', $wrongFilters));
+		}
 		$jobs = [];
 		$jobsNames = [];
 		foreach($config['job'] as $job){
