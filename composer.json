@@ -12,4 +12,5 @@
     "psr-4": { "SfNix\\UpstartBundle\\": "" }
   },
   "bin": ["bin/upstart"]
+  ,"version:":"1.0.6"
 }
