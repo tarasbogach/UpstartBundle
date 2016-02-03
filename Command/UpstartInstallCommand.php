@@ -19,8 +19,9 @@ class UpstartInstallCommand extends Base{
 				InputOption::VALUE_NONE,
 				'Do not try to install or update bash completion script for bin/upstart application.'
 			)
-			->setDescription(<<<DESC
-Generate and install upstart files derived from you configuration.
+			->setDescription(
+				<<<DESC
+				Generate and install upstart files derived from you configuration.
 Use job names and tags as filter. Apply to all jobs if no filters are specified.
 It also will try to enable bash completion for  bin/upstart application, including possible filter arguments.
 DESC
@@ -29,17 +30,10 @@ DESC
 
 	protected function execute(InputInterface $input, OutputInterface $output){
 		parent::execute($input, $output);
-		$container = $this->getContainer();
-		$config = $container->getParameter('upstart');
-
-//		$rootDir = $container->getParameter('kernel.root_dir');
-//		$completionFile = "$rootDir/bin_upstart_bash_completion.sh";
-//		echo $rootDir;
-//		exit();
-//		if(file_exists()){
-//
-//		}
-
+		$config = $this->getContainer()->getParameter('upstart');
+		if(!$input->getOption('no-bash-completion')){
+			$this->installBashCompletion($output, $config);
+		}
 		$filters = $input->getArgument('filter');
 		if($filters){
 			$jobs = $this->filter($filters);
@@ -170,6 +164,91 @@ BODY;
 			}else{
 				throw new \Exception("Can not write '$instanceFile'.");
 			}
+		}
+	}
+
+	/**
+	 * @param OutputInterface $output
+	 * @param $config
+	 * @throws \Exception
+	 */
+	protected function installBashCompletion(OutputInterface $output, $config){
+		$rootDir = $this->getContainer()->getParameter('kernel.root_dir');
+		$completionFile = "$rootDir/bin-upstart-bash-completion.sh";
+		if(file_exists($completionFile)){
+			if(unlink($completionFile)){
+				$output->writeln('<info>-file ' . $completionFile.'</info>');
+			}else{
+				throw new \Exception("Can not delete '$completionFile'.");
+			}
+		}
+		$appOptions = ['-v', '-vv', '-vvv'];
+		foreach($this->getApplication()->getDefinition()->getOptions() as $commandOption){
+			$appOptions[] = '--'.$commandOption->getName();
+			if($commandOption->getShortcut() && $commandOption->getName() != 'verbose'){
+				$appOptions[] = '-'.$commandOption->getShortcut();
+			}
+		}
+		$appOptions = implode(' ', $appOptions);
+		$appOptions = escapeshellarg($appOptions);
+		$filters = array_merge($config['tagNames'], $config['jobNames']);
+		$filters = implode(' ', $filters);
+		$filters = escapeshellarg($filters);
+		$commandCases = [];
+		foreach(['install','start','stop','restart','list','log','delete','test'] as $commandName){
+			$command = $this->getApplication()->get($commandName);
+			$commandOptions = [];
+			foreach($command->getDefinition()->getOptions() as $commandOption){
+				$commandOptions[] = '--'.$commandOption->getName();
+				if($commandOption->getShortcut()){
+					$commandOptions[] = '-'.$commandOption->getShortcut();
+				}
+			}
+			$commandOptions = implode(' ', $commandOptions);
+			$commandOptions = escapeshellarg($commandOptions);
+			$commandName = escapeshellarg($commandName);
+			if($command->getDefinition()->hasArgument('filter')){
+				$commandCases[] = <<<CASE
+				$commandName)
+					if [ "\${COMP_WORDS[COMP_CWORD]:0:1}" = "-" ]
+					then
+						COMPREPLY=( $(compgen -W {$commandOptions}{$appOptions} -- \${COMP_WORDS[COMP_CWORD]}) )
+					else
+						COMPREPLY=( $(compgen -W $filters -- \${COMP_WORDS[COMP_CWORD]}) )
+					fi
+				;;
+CASE;
+			}else{
+				$commandCases[] = <<<CASE
+				$commandName)
+					if [ "\${COMP_WORDS[COMP_CWORD]:0:1}" = "-" ]
+					then
+						COMPREPLY=( $(compgen -W {$commandOptions}{$appOptions} -- \${COMP_WORDS[COMP_CWORD]}) )
+					fi
+				;;
+CASE;
+			}
+
+		}
+		$commandCases = implode("\n", $commandCases);
+		$content = <<<BASH
+COMPREPLY=()
+case "\$COMP_CWORD" in
+	1)
+		COMPREPLY=( $(compgen -W "install start stop restart list log delete test" -- \${COMP_WORDS[COMP_CWORD]}) )
+	;;
+	*)
+		case "\${COMP_WORDS[1]}" in
+			$commandCases
+		esac
+	;;
+esac
+return 0
+BASH;
+		if(file_put_contents($completionFile, $content)){
+			$output->writeln('<info>+file ' . $completionFile.'</info>');
+		}else{
+			throw new \Exception("Can not create '$completionFile'.");
 		}
 	}
 
