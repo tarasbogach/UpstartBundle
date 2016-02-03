@@ -3,7 +3,6 @@
 namespace SfNix\UpstartBundle\Command;
 
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,28 +13,49 @@ class UpstartInstallCommand extends Base{
 		parent::configure();
 		$this
 			->setName('upstart:install')
-			->setDescription(
-				'Generate and install upstart files derived configuration. It also will try to enable bash completion for other commands of this bundle, including arguments derived configuration. Use job names and tags as filter. Apply to all jobs if no filters are specified.'
+			->addOption(
+				'no-bash-completion',
+				'nbc',
+				InputOption::VALUE_NONE,
+				'Do not try to install or update bash completion script for bin/upstart application.'
+			)
+			->setDescription(<<<DESC
+Generate and install upstart files derived from you configuration.
+Use job names and tags as filter. Apply to all jobs if no filters are specified.
+It also will try to enable bash completion for  bin/upstart application, including possible filter arguments.
+DESC
 			);
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output){
 		parent::execute($input, $output);
-		$config = $this->getContainer()->getParameter('upstart');
+		$container = $this->getContainer();
+		$config = $container->getParameter('upstart');
+
+//		$rootDir = $container->getParameter('kernel.root_dir');
+//		$completionFile = "$rootDir/bin_upstart_bash_completion.sh";
+//		echo $rootDir;
+//		exit();
+//		if(file_exists()){
+//
+//		}
+
 		$filters = $input->getArgument('filter');
 		if($filters){
 			$jobs = $this->filter($filters);
 		}else{
 			$jobs = $config['job'];
-			$this->getApplication()->find('upstart:delete')->run(new ArrayInput([]), $output);
+			$deleteCommand = $this->getApplication()->has('upstart:delete') ?
+				$this->getApplication()->get('upstart:delete') :
+				$this->getApplication()->get('delete');
+			$deleteCommand->run(new ArrayInput([]), $output);
 		}
-		$dir = $file = "{$config['configDir']}/{$config['project']}";
+		$dir = "{$config['configDir']}/{$config['project']}";
 		if(!file_exists($dir)){
 			if(mkdir($dir)){
 				$output->writeln("<info>Dir '$dir' is created.</info>");
 			}else{
 				$output->writeln("<error>Can not mkdir '$dir'.</error>");
-
 				throw new \Exception("Can not mkdir '$dir'.");
 			}
 		}
@@ -67,7 +87,7 @@ class UpstartInstallCommand extends Base{
 				switch($stanza){
 					case 'start on':
 					case 'stop on':
-						if($options['quantity']>1){
+						if($options['quantity'] > 1){
 							$controllerContent[] = "$stanza $value";
 						}else{
 							$instanceContent[] = "$stanza $value";
