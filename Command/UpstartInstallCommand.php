@@ -2,6 +2,7 @@
 
 namespace SfNix\UpstartBundle\Command;
 
+use SfNix\UpstartBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -207,8 +208,9 @@ PROFILE;
 		$filters = escapeshellarg($filters);
 		$cases = [];
 		$names = ['install', 'start', 'stop', 'restart', 'list', 'log', 'delete', 'test'];
+		$ns = ($this->getApplication() instanceof Application)?'':'upstart:';
 		foreach($names as $name){
-			$command = $this->getApplication()->get($name);
+			$command = $this->getApplication()->get($ns.$name);
 			$options = ['-v', '-vv', '-vvv'];
 			foreach($command->getDefinition()->getOptions() as $option){
 				$options[] = '--' . $option->getName();

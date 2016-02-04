@@ -1,4 +1,5 @@
 #UpstartBundle
+For Symfony 2 and 3.
 ##About
 This is a [Symfony](http://symfony.com/what-is-symfony) bundle for painless [Upstart](http://upstart.ubuntu.com/cookbook/#introduction) configuration.
 It helps to make any symfony command (or any other script) run forever in background and restart on fails.
@@ -90,6 +91,15 @@ You can use test command as script in your job configuration, for learning purpo
 It runs forever by default, but take a look at `--exit` and `--error` options. 
 ```bash
 # ./app/console upstart:test --error 10 -vvv
+```
+##Separate console application with bash completion support.
+This bundle includes separate console application ```./bin/upstart```.
+Each command of this bundle is available through this application without "upstart:" namespace.
+```./bin/upstart``` also has **bash completion** support for each command option, **job names and tags**.
+To start using bash completion, you must run ```./bin/upstart install```, then logout and login to your terminal.
+Usage:
+```bash
+# ./bin/upstart <Tab>
 ```
 ##Full configuration reference
 Read [Upstart Cookbook](http://upstart.ubuntu.com/cookbook/#stanzas-by-category) for detailed description of all native stanzas.

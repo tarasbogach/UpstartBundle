@@ -26,11 +26,9 @@ class UpstartRestartCommand extends Base{
 					$this->exec('initctl emit %s', ["{$config['project']}.{$filter}.stop"]);
 					$this->exec('initctl emit %s', ["{$config['project']}.{$filter}.start"]);
 				}elseif(in_array($filter, $config['jobNames'])){
-					$job = $config['job'][$filter];
-					$postfix = $job['quantity'] > 1 ? '-stopper':'';
-					$this->exec('initctl start %s', ["{$config['project']}/{$filter}{$postfix}"]);
-					$postfix = $job['quantity'] > 1 ? '-starter':'';
-					$this->exec('initctl start %s', ["{$config['project']}/{$filter}{$postfix}"]);
+//					$job = $config['job'][$filter];
+					$this->exec('initctl start %s', ["{$config['project']}/{$filter}"]);
+					$this->exec('initctl start %s', ["{$config['project']}/{$filter}"]);
 				}
 			}
 		}else{
