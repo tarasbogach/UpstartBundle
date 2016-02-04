@@ -2,15 +2,15 @@
 
 namespace SfNix\UpstartBundle\Command;
 
-use Symfony\Component\Console\Input\InputArgument;
+
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class UpstartTestCommand extends Base{
+class UpstartTestCommand extends ContainerAwareCommand{
 
 	protected function configure(){
-		parent::configure();
 		$this
 			->setName('upstart:test')
 			->setDescription('Example job.')
@@ -20,7 +20,6 @@ class UpstartTestCommand extends Base{
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output){
-		parent::execute($input, $output);
 		$logger = $this->getContainer()->get('logger');
 		$startAt = time();
 		$exitAt = $input->getOption('exit') ? $startAt + $input->getOption('exit') : null;
