@@ -93,13 +93,16 @@ It runs forever by default, but take a look at `--exit` and `--error` options.
 # ./app/console upstart:test --error 10 -vvv
 ```
 ##Separate console application with bash completion support.
-This bundle includes separate console application ```./bin/upstart```.
+This bundle includes separate console application ```./bin/upstart``` (Symfony 2) or ```./vendor/bin/upstart``` (Symfony 3).
 Each command of this bundle is available through this application without "upstart:" namespace.
-```./bin/upstart``` also has **bash completion** support for each command option, **job names and tags**.
-To start using bash completion, you must run ```./bin/upstart install```, then logout and login to your terminal.
+```upstart``` also has **bash completion** support for command **options, job names and tags**.
+To start using bash completion, you must run ```upstart install```, then logout and login again.
 Usage:
 ```bash
+# ./bin/upstart install
+# exit
 # ./bin/upstart <Tab>
+# ./bin/upstart start <Tab>
 ```
 ##Full configuration reference
 Read [Upstart Cookbook](http://upstart.ubuntu.com/cookbook/#stanzas-by-category) for detailed description of all native stanzas.
@@ -140,7 +143,7 @@ upstart:
                 # Examples:
                 - myVar1
                 - myVar2
-            #Used to change Upstart\'s idea of what a "normal" exit status is.
+            #Used to change Upstart's idea of what a "normal" exit status is.
             #Conventionally, processes exit with status 0 (zero) to denote success and non-zero to denote failure.
             normalExit: ~ #Example: [0, 13, SIGUSR1, SIGWINCH]
             #With this stanza, whenever the main script/exec exits,
@@ -286,7 +289,7 @@ upstart:
               postStop: ~ # Example: /some/directory/script
               # Allows the specification of a multi-line block of shell code to be executed. Block is terminated by end script.
               script: ~ # Example: /some/directory/script >> /var/log/some-log.log
-              #Used to change Upstart\'s idea of what a "normal" exit status is.
+              #Used to change Upstart's idea of what a "normal" exit status is.
               #Conventionally, processes exit with status 0 (zero) to denote success and non-zero to denote failure.
               normalExit: ~ #Example: [0, 13, SIGUSR1, SIGWINCH]
               #With this stanza, whenever the main script/exec exits,
