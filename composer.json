@@ -2,7 +2,7 @@
   "name": "sfnix/upstart",
   "description": "Upstart integration for Symfony projects.",
   "type": "symfony-bundle",
-  "keywords": ["upstart", "utils", "linux"],
+  "keywords": ["symfony", "bundle", "upstart", "utils", "linux"],
   "homepage": "https://github.com/tarasbogach/UpstartBundle",
   "license": "GPL",
   "authors": [
