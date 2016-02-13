@@ -4,9 +4,21 @@ $dir = dirname($_SERVER['PHP_SELF']);
 if(file_exists("$dir/../app/autoload.php")){
 	#Symfony 2
 	include_once "$dir/../app/autoload.php";
-}else{
+	if(file_exists("$dir/../app/bootstrap.php.cache")){
+		include_once "$dir/../app/bootstrap.php.cache";
+	}
+	if(file_exists("$dir/../app/AppKernel.php")){
+		include_once "$dir/../app/AppKernel.php";
+	}
+}elseif(file_exists("$dir/../autoload.php")){
 	#Symfony 3
 	include_once "$dir/../autoload.php";
+	if(file_exists("$dir/../var/bootstrap.php.cache")){
+		include_once "$dir/../var/bootstrap.php.cache";
+	}
+	if(file_exists("$dir/../app/AppKernel.php")){
+		include_once "$dir/../app/AppKernel.php";
+	}
 }
 
 use SfNix\UpstartBundle\Console\Application;
