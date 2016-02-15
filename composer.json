@@ -1,8 +1,8 @@
 {
   "name": "sfnix/upstart",
-  "description": "Upstart integration for Symfony projects.",
+  "description": "Symfony bundle for painless Upstart configuration. It helps to make any script run forever in background on Linux.",
   "type": "symfony-bundle",
-  "keywords": ["symfony", "bundle", "upstart", "utils", "linux"],
+  "keywords": ["symfony", "bundle", "upstart", "utils", "linux", "service", "background"],
   "homepage": "https://github.com/tarasbogach/UpstartBundle",
   "license": "GPL",
   "authors": [
