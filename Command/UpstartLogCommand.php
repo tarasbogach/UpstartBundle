@@ -15,7 +15,7 @@ class UpstartLogCommand extends Base{
 			->setName('upstart:log')
 			->setDescription('Show tails of logs of jobs. It can show logs continuously with --watch (-w) option. If you are redirecting script output in any way then you need to use log, logDir job config options. Use job names and tags as filter. Apply to all jobs if no filters are specified.')
 			->addOption('watch', 'w', InputOption::VALUE_NONE, 'Show statuses continuously.')
-			->addOption('tail', 't', InputOption::VALUE_OPTIONAL, 'Size of a tail (not working with multiple logs).', 10)
+			->addOption('tail', 't', InputOption::VALUE_OPTIONAL, 'Size of a tail (not working with multiple logs).', 20)
 		;
 	}
 

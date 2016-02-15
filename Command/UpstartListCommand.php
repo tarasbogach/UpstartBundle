@@ -35,7 +35,7 @@ class UpstartListCommand extends Base{
 		}
 		if($input->getOption('watch')){
 			$interval = $input->getOption('interval');
-			$this->passthru('watch -n %s %s', [$interval, "initctl list | grep $grepArgs | sort"]);
+			$this->passthru('watch -d -n %s %s', [$interval, "initctl list | grep $grepArgs | sort"]);
 		}else{
 			$return = $this->exec("initctl list | grep $grepArgs | sort", []);
 			foreach(explode("\n", $return) as $line){
