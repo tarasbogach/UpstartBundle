@@ -41,12 +41,36 @@ abstract class Base extends ContainerAwareCommand{
 		return shell_exec($command);
 	}
 
+	protected function checkFilters($filters){
+		$config = $this->getContainer()->getParameter('upstart');
+		$possibleFilters = array_merge($config['jobNames'], $config['tagNames']);
+		$wrongFilters = array_diff($filters, $possibleFilters);
+		if($wrongFilters){
+			$closestFilters = [];
+			if(function_exists('levenshtein')){
+				foreach($wrongFilters as $filter){
+					usort(
+						$possibleFilters,
+						function ($a, $b) use ($filter){
+							return levenshtein($a, $filter) - levenshtein($b, $filter);
+						}
+					);
+					$closestFilters[] = "Did you mean '{$possibleFilters[0]}' instead of '$filter'?";
+				}
+			}
+			$desc = [];
+			$desc[] = 'Unknown filters found: ' . implode(', ', $wrongFilters) . '.';
+			$desc[] = 'Filter can be job or tag name only.';
+			if($closestFilters){
+				$desc[] = implode("\n", $closestFilters);
+			}
+			throw new \Exception(implode("\n", $desc));
+		}
+	}
+
 	protected function filter($filters){
 		$config = $this->getContainer()->getParameter('upstart');
-		$wrongFilters = array_diff($filters, $config['jobNames'], $config['tagNames']);
-		if($wrongFilters){
-			throw new \Exception('Unknown filters found: '.implode(', ', $wrongFilters));
-		}
+		$this->checkFilters($filters);
 		$jobs = [];
 		$jobsNames = [];
 		foreach($config['job'] as $job){

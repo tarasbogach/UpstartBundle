@@ -23,6 +23,7 @@ class UpstartStopCommand extends Base{
 		$config = $this->getContainer()->getParameter('upstart');
 		$filters = $input->getArgument('filter');
 		if($filters){
+			$this->checkFilters($filters);
 			foreach($filters as $filter){
 				if(in_array($filter, $config['tagNames'])){
 					$this->exec('initctl emit %s', ["{$config['project']}.{$filter}.stop"]);
