@@ -15,15 +15,24 @@ Register the bundle:
 
 public function registerBundles()
 {
+    //...
     $bundles = [
+        //...
         new SfNix\UpstartBundle\UpstartBundle(),
     ];
+    //...
 }
 ```
 ##Usage
-Add the `upstart` section to your configuration file:
+Add the `upstart` section to your configuration files:
 ```yml
-# Example app/config/upstart.yml
+# app/config/config.yml
+imports:
+    # ...
+    - { resource: upstart.yml }
+```
+```yml
+# app/config/upstart.yml
 upstart:
     project: imagin
     default:

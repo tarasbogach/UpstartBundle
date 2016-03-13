@@ -107,7 +107,7 @@ DESC
 						break;
 					case 'env':
 						foreach($value as $itemName => $item){
-							if($item){
+							if(!is_null($item)){
 								$instanceContent[] = "$stanza $itemName=$item";
 							}else{
 								$instanceContent[] = "$stanza $itemName";
