@@ -4,7 +4,7 @@
   "type": "symfony-bundle",
   "keywords": ["symfony", "bundle", "upstart", "utils", "linux", "service", "background"],
   "homepage": "https://github.com/tarasbogach/UpstartBundle",
-  "license": "GPL",
+  "license": "GPL-2.0-or-later",
   "authors": [
     {"name": "Taras Bogach", "email": "taras.bogach@gmail.com"}
   ],
